@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Models\Post;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -18,12 +20,28 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+        'posts' => Post::all(),
     ]);
 });
+
+Route::post('/', function (Request $request) {
+    // validation
+
+    Post::create([
+        'title' => $request->title,
+        'content' => $request->content,
+    ]);
+
+    return back()->with('message', 'Post was created!');
+});
+
+Route::get('/posts/{post}', function (Post $post) {
+    // dd($post->content);
+
+    return Inertia::render('Show', [
+        'post' => $post,
+    ]);
+})->name('post.show');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
